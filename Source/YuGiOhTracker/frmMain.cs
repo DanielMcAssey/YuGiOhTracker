@@ -145,7 +145,7 @@ namespace YuGiOhTracker
 		{
 			RefreshData newRefreshData = new RefreshData();
 			refreshDataWorker.ReportProgress(0);
-			//newRefreshData.SetListData = objDBManager.FindAllBundlesDT();
+			//newRefreshData.SetListData = objDBManager.FindAllBundlesDT(); //TODO
 			refreshDataWorker.ReportProgress(50);
 			//newRefreshData.CardListData = objDBManager.FindAllCardsDT();
 			refreshDataWorker.ReportProgress(100);
@@ -640,6 +640,63 @@ namespace YuGiOhTracker
 		}
 		#endregion
 
+		#region "User Collection List (Search)
+		private void btnUserCollectionSearch_Click(object sender, EventArgs e)
+		{
+			SearchData sendSearchData = new SearchData();
+			sendSearchData.SearchDGV = "user";
+			sendSearchData.SearchText = txtUserCollectionSearch.Text;
+			sendSearchData.Box1Text = (cbUserCollectionIn.SelectedItem as ComboboxItem).Value.ToString();
+			sendSearchData.Box2Text = (cbUserCollectionCardType.SelectedItem as ComboboxItem).Value.ToString();
+			searchWorker.RunWorkerAsync(sendSearchData);
+		}
+
+		private void txtUserCollectionSearch_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.KeyCode == Keys.Enter)
+			{
+				SearchData sendSearchData = new SearchData();
+				sendSearchData.SearchDGV = "user";
+				sendSearchData.SearchText = txtUserCollectionSearch.Text;
+				sendSearchData.Box1Text = (cbUserCollectionIn.SelectedItem as ComboboxItem).Value.ToString();
+				sendSearchData.Box2Text = (cbUserCollectionCardType.SelectedItem as ComboboxItem).Value.ToString();
+				searchWorker.RunWorkerAsync(sendSearchData);
+			}
+		}
+
+		private int SearchUserList(SearchData searchData)
+		{
+			int rowIndex = -1;
+			double rowCount = dgvUserCollection.RowCount;
+
+			if (dgvUserCollection.Columns[searchData.Box1Text] != null)
+			{
+				double currentRowNumber = 0;
+				foreach (DataGridViewRow row in dgvUserCollection.Rows)
+				{
+					if (row.Cells[searchData.Box1Text].Value.ToString().Contains(searchData.SearchText))
+					{
+						rowIndex = row.Index;
+						break;
+					}
+					currentRowNumber += 1;
+
+					if (searchWorker.IsBusy)
+					{
+						int progressPercentage = Convert.ToInt32(Math.Round((currentRowNumber / rowCount) * 100));
+						searchWorker.ReportProgress(progressPercentage);
+					}
+				}
+			}
+
+			if (rowIndex >= 0)
+				return rowIndex;
+			else
+				return -1;
+
+		}
+		#endregion
+
 		#region "Card List (DGV)"
 		private void dgvCardList_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
 		{
@@ -786,6 +843,56 @@ namespace YuGiOhTracker
 
 		#endregion
 
+		#region "User Collection List (DGV)"
+		private void dgvUserCollection_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+		{
+			ViewCard(e.RowIndex, ref dgvUserCollection);
+		}
+
+		private void dgvUserCollection_MouseClick(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				int currentMouseOverRow = dgvUserCollection.HitTest(e.X, e.Y).RowIndex;
+				if (currentMouseOverRow >= 0)
+				{
+					ContextMenu cm = new ContextMenu();
+					cm.MenuItems.Add(new MenuItem("View Card...", new EventHandler(cmViewCardUser)));
+					cm.MenuItems.Add(new MenuItem("Remove Card", new EventHandler(cmRemoveCardUser)));
+
+					selectedIndex = currentMouseOverRow;
+					dgvUserCollection.CurrentCell = dgvUserCollection.Rows[currentMouseOverRow].Cells["name"];
+					dgvUserCollection.Rows[currentMouseOverRow].Selected = true;
+
+					cm.Show(dgvUserCollection, new Point(e.X, e.Y));
+				}
+			}
+		}
+
+		private void dgvUserCollection_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				foreach (DataGridViewRow row in dgvUserCollection.SelectedRows)
+				{
+					ViewCard(row.Index, ref dgvUserCollection);
+				}
+
+				e.Handled = true;
+			}
+		}
+
+		protected void cmRemoveCardUser(Object sender, EventArgs e)
+		{
+			ViewCard(selectedIndex, ref dgvUserCollection); //TODO
+		}
+
+		protected void cmViewCardUser(Object sender, EventArgs e)
+		{
+			ViewCard(selectedIndex, ref dgvUserCollection);
+		}
+		#endregion
+
 		public frmMain()
 		{
 			InitializeComponent();
@@ -840,5 +947,16 @@ namespace YuGiOhTracker
 					break;
 			}
 		}
+
+		private void btnUserCollectionAdd_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		
+
+		
+
+		
 	}
 }

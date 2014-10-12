@@ -82,6 +82,9 @@
 			this.ssSpring = new System.Windows.Forms.ToolStripStatusLabel();
 			this.ssCardCount = new System.Windows.Forms.ToolStripStatusLabel();
 			this.ssMainProgress = new System.Windows.Forms.ToolStripProgressBar();
+			this.btnUserCollectionAdd = new System.Windows.Forms.Button();
+			this.lblUserCollectionAdd = new System.Windows.Forms.Label();
+			this.txtUserCollectionAdd = new System.Windows.Forms.TextBox();
 			this.msMain.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dgvCardList)).BeginInit();
 			this.tcMain.SuspendLayout();
@@ -124,19 +127,19 @@
 			// msMainFileSettings
 			// 
 			this.msMainFileSettings.Name = "msMainFileSettings";
-			this.msMainFileSettings.Size = new System.Drawing.Size(152, 22);
+			this.msMainFileSettings.Size = new System.Drawing.Size(125, 22);
 			this.msMainFileSettings.Text = "Settings...";
 			this.msMainFileSettings.Click += new System.EventHandler(this.msMainFileSettings_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(122, 6);
 			// 
 			// msMainFileExit
 			// 
 			this.msMainFileExit.Name = "msMainFileExit";
-			this.msMainFileExit.Size = new System.Drawing.Size(152, 22);
+			this.msMainFileExit.Size = new System.Drawing.Size(125, 22);
 			this.msMainFileExit.Text = "Exit";
 			this.msMainFileExit.Click += new System.EventHandler(this.msMainFileExit_Click);
 			// 
@@ -389,6 +392,9 @@
 			// 
 			// gbUserCollection
 			// 
+			this.gbUserCollection.Controls.Add(this.txtUserCollectionAdd);
+			this.gbUserCollection.Controls.Add(this.lblUserCollectionAdd);
+			this.gbUserCollection.Controls.Add(this.btnUserCollectionAdd);
 			this.gbUserCollection.Controls.Add(this.cbUserCollectionCardType);
 			this.gbUserCollection.Controls.Add(this.label2);
 			this.gbUserCollection.Controls.Add(this.btnUserCollectionSearch);
@@ -430,6 +436,7 @@
 			this.btnUserCollectionSearch.TabIndex = 6;
 			this.btnUserCollectionSearch.Text = "Search";
 			this.btnUserCollectionSearch.UseVisualStyleBackColor = true;
+			this.btnUserCollectionSearch.Click += new System.EventHandler(this.btnUserCollectionSearch_Click);
 			// 
 			// label3
 			// 
@@ -455,6 +462,7 @@
 			this.txtUserCollectionSearch.Name = "txtUserCollectionSearch";
 			this.txtUserCollectionSearch.Size = new System.Drawing.Size(250, 20);
 			this.txtUserCollectionSearch.TabIndex = 2;
+			this.txtUserCollectionSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtUserCollectionSearch_KeyDown);
 			// 
 			// lblUserCollSearch
 			// 
@@ -474,13 +482,16 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.dgvUserCollection.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-			this.dgvUserCollection.Location = new System.Drawing.Point(6, 46);
+			this.dgvUserCollection.Location = new System.Drawing.Point(6, 75);
 			this.dgvUserCollection.MultiSelect = false;
 			this.dgvUserCollection.Name = "dgvUserCollection";
 			this.dgvUserCollection.ReadOnly = true;
 			this.dgvUserCollection.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.dgvUserCollection.Size = new System.Drawing.Size(887, 347);
+			this.dgvUserCollection.Size = new System.Drawing.Size(887, 318);
 			this.dgvUserCollection.TabIndex = 1;
+			this.dgvUserCollection.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvUserCollection_CellDoubleClick);
+			this.dgvUserCollection.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgvUserCollection_KeyDown);
+			this.dgvUserCollection.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgvUserCollection_MouseClick);
 			// 
 			// tpUserDecks
 			// 
@@ -639,6 +650,32 @@
 			this.ssMainProgress.Name = "ssMainProgress";
 			this.ssMainProgress.Size = new System.Drawing.Size(100, 16);
 			// 
+			// btnUserCollectionAdd
+			// 
+			this.btnUserCollectionAdd.Location = new System.Drawing.Point(768, 46);
+			this.btnUserCollectionAdd.Name = "btnUserCollectionAdd";
+			this.btnUserCollectionAdd.Size = new System.Drawing.Size(125, 23);
+			this.btnUserCollectionAdd.TabIndex = 8;
+			this.btnUserCollectionAdd.Text = "Add";
+			this.btnUserCollectionAdd.UseVisualStyleBackColor = true;
+			this.btnUserCollectionAdd.Click += new System.EventHandler(this.btnUserCollectionAdd_Click);
+			// 
+			// lblUserCollectionAdd
+			// 
+			this.lblUserCollectionAdd.AutoSize = true;
+			this.lblUserCollectionAdd.Location = new System.Drawing.Point(6, 51);
+			this.lblUserCollectionAdd.Name = "lblUserCollectionAdd";
+			this.lblUserCollectionAdd.Size = new System.Drawing.Size(176, 13);
+			this.lblUserCollectionAdd.TabIndex = 9;
+			this.lblUserCollectionAdd.Text = "Card Codes (Seperate with comma):";
+			// 
+			// txtUserCollectionAdd
+			// 
+			this.txtUserCollectionAdd.Location = new System.Drawing.Point(188, 48);
+			this.txtUserCollectionAdd.Name = "txtUserCollectionAdd";
+			this.txtUserCollectionAdd.Size = new System.Drawing.Size(574, 20);
+			this.txtUserCollectionAdd.TabIndex = 10;
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -735,6 +772,9 @@
 		private System.Windows.Forms.DataGridView dgvLimitedCards;
 		private System.Windows.Forms.ToolStripMenuItem msMainFileSettings;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.TextBox txtUserCollectionAdd;
+		private System.Windows.Forms.Label lblUserCollectionAdd;
+		private System.Windows.Forms.Button btnUserCollectionAdd;
 	}
 }
 

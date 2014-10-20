@@ -683,5 +683,28 @@ namespace TrackerSystem.DBManager
 				}
 			}
 		}
+
+		public List<UserCardBundle> GetAllUserBundles()
+		{
+			List<UserCardBundle> result = new List<UserCardBundle>();
+			using (SQLiteConnection dbUser = new SQLiteConnection(UserConnection))
+			{
+				dbUser.Open();
+
+				string sql = "SELECT * FROM userdecks";
+				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbUser);
+				SQLiteDataReader reader = sqlCMD.ExecuteReader();
+				while (reader.Read())
+				{
+					UserCardBundle tmpBundle = new UserCardBundle();
+					tmpBundle.ID = Convert.ToInt32(reader["id"].ToString());
+					tmpBundle.BundleName = reader["name"].ToString();
+					tmpBundle.CardCount = Convert.ToInt32(reader["count"].ToString());
+					result.Add(tmpBundle);
+				}
+			}
+
+			return result;
+		}
 	}
 }

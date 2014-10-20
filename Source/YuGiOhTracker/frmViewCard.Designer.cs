@@ -83,10 +83,10 @@
 			this.txtPriceHigh = new System.Windows.Forms.TextBox();
 			this.lblPriceHigh = new System.Windows.Forms.Label();
 			this.gbSimilarCards = new System.Windows.Forms.GroupBox();
-			this.dgvCardList = new System.Windows.Forms.DataGridView();
-			this.lblSimilarCardStatus = new System.Windows.Forms.Label();
-			this.lblSimilarSeperator = new System.Windows.Forms.Label();
 			this.lblSimilarCardCount = new System.Windows.Forms.Label();
+			this.lblSimilarSeperator = new System.Windows.Forms.Label();
+			this.lblSimilarCardStatus = new System.Windows.Forms.Label();
+			this.dgvCardList = new System.Windows.Forms.DataGridView();
 			this.gbCardDetails.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbCardView)).BeginInit();
@@ -108,8 +108,6 @@
 			// 
 			// gbCardDetails
 			// 
-			this.gbCardDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gbCardDetails.Controls.Add(this.lblBannedText);
 			this.gbCardDetails.Controls.Add(this.lblCardCodeSeperator);
 			this.gbCardDetails.Controls.Add(this.lblCardCode);
@@ -227,7 +225,7 @@
 			this.txtDEF.Name = "txtDEF";
 			this.txtDEF.ReadOnly = true;
 			this.txtDEF.Size = new System.Drawing.Size(110, 20);
-			this.txtDEF.TabIndex = 18;
+			this.txtDEF.TabIndex = 4;
 			this.txtDEF.Text = "%CARDDEF%";
 			// 
 			// txtATK
@@ -236,7 +234,7 @@
 			this.txtATK.Name = "txtATK";
 			this.txtATK.ReadOnly = true;
 			this.txtATK.Size = new System.Drawing.Size(110, 20);
-			this.txtATK.TabIndex = 17;
+			this.txtATK.TabIndex = 3;
 			this.txtATK.Text = "%CARDATK%";
 			// 
 			// lblDEF
@@ -290,7 +288,7 @@
 			this.txtCardSubtype.Name = "txtCardSubtype";
 			this.txtCardSubtype.ReadOnly = true;
 			this.txtCardSubtype.Size = new System.Drawing.Size(263, 20);
-			this.txtCardSubtype.TabIndex = 11;
+			this.txtCardSubtype.TabIndex = 2;
 			this.txtCardSubtype.Text = "%CARDTYPE%";
 			// 
 			// txtAttribute
@@ -299,7 +297,7 @@
 			this.txtAttribute.Name = "txtAttribute";
 			this.txtAttribute.ReadOnly = true;
 			this.txtAttribute.Size = new System.Drawing.Size(263, 20);
-			this.txtAttribute.TabIndex = 10;
+			this.txtAttribute.TabIndex = 1;
 			this.txtAttribute.Text = "%CARDATTRIBUTE%";
 			// 
 			// lblAttribute
@@ -403,8 +401,6 @@
 			// 
 			// gbPriceHistory
 			// 
-			this.gbPriceHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gbPriceHistory.Controls.Add(this.lblPriceStatus);
 			this.gbPriceHistory.Controls.Add(this.lblPriceLastUpdated);
 			this.gbPriceHistory.Controls.Add(this.lblPriceDescription);
@@ -428,7 +424,7 @@
 			this.gbPriceHistory.Controls.Add(this.lblPriceAverage);
 			this.gbPriceHistory.Controls.Add(this.txtPriceHigh);
 			this.gbPriceHistory.Controls.Add(this.lblPriceHigh);
-			this.gbPriceHistory.Location = new System.Drawing.Point(12, 416);
+			this.gbPriceHistory.Location = new System.Drawing.Point(612, 12);
 			this.gbPriceHistory.Name = "gbPriceHistory";
 			this.gbPriceHistory.Size = new System.Drawing.Size(594, 189);
 			this.gbPriceHistory.TabIndex = 2;
@@ -437,6 +433,9 @@
 			// 
 			// lblPriceStatus
 			// 
+			this.lblPriceStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.lblPriceStatus.Location = new System.Drawing.Point(6, 16);
 			this.lblPriceStatus.Name = "lblPriceStatus";
 			this.lblPriceStatus.Size = new System.Drawing.Size(582, 170);
@@ -643,19 +642,46 @@
 			// 
 			// gbSimilarCards
 			// 
-			this.gbSimilarCards.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gbSimilarCards.Controls.Add(this.lblSimilarCardCount);
 			this.gbSimilarCards.Controls.Add(this.lblSimilarSeperator);
 			this.gbSimilarCards.Controls.Add(this.lblSimilarCardStatus);
 			this.gbSimilarCards.Controls.Add(this.dgvCardList);
-			this.gbSimilarCards.Location = new System.Drawing.Point(12, 611);
+			this.gbSimilarCards.Location = new System.Drawing.Point(612, 207);
 			this.gbSimilarCards.Name = "gbSimilarCards";
-			this.gbSimilarCards.Size = new System.Drawing.Size(594, 112);
+			this.gbSimilarCards.Size = new System.Drawing.Size(594, 203);
 			this.gbSimilarCards.TabIndex = 3;
 			this.gbSimilarCards.TabStop = false;
 			this.gbSimilarCards.Text = "Similar Cards";
+			// 
+			// lblSimilarCardCount
+			// 
+			this.lblSimilarCardCount.AutoSize = true;
+			this.lblSimilarCardCount.Location = new System.Drawing.Point(87, 0);
+			this.lblSimilarCardCount.Name = "lblSimilarCardCount";
+			this.lblSimilarCardCount.Size = new System.Drawing.Size(134, 13);
+			this.lblSimilarCardCount.TabIndex = 5;
+			this.lblSimilarCardCount.Text = "%CARDSIMILARCOUNT%";
+			// 
+			// lblSimilarSeperator
+			// 
+			this.lblSimilarSeperator.AutoSize = true;
+			this.lblSimilarSeperator.Location = new System.Drawing.Point(71, 0);
+			this.lblSimilarSeperator.Name = "lblSimilarSeperator";
+			this.lblSimilarSeperator.Size = new System.Drawing.Size(10, 13);
+			this.lblSimilarSeperator.TabIndex = 4;
+			this.lblSimilarSeperator.Text = "-";
+			// 
+			// lblSimilarCardStatus
+			// 
+			this.lblSimilarCardStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblSimilarCardStatus.Location = new System.Drawing.Point(6, 16);
+			this.lblSimilarCardStatus.Name = "lblSimilarCardStatus";
+			this.lblSimilarCardStatus.Size = new System.Drawing.Size(582, 181);
+			this.lblSimilarCardStatus.TabIndex = 3;
+			this.lblSimilarCardStatus.Text = "Loading Similar Cards...";
+			this.lblSimilarCardStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// dgvCardList
 			// 
@@ -671,44 +697,17 @@
 			this.dgvCardList.Name = "dgvCardList";
 			this.dgvCardList.ReadOnly = true;
 			this.dgvCardList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.dgvCardList.Size = new System.Drawing.Size(582, 87);
+			this.dgvCardList.Size = new System.Drawing.Size(582, 178);
 			this.dgvCardList.TabIndex = 2;
 			this.dgvCardList.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCardList_CellContentDoubleClick);
 			this.dgvCardList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgvCardList_KeyDown);
 			this.dgvCardList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgvCardList_MouseClick);
 			// 
-			// lblSimilarCardStatus
-			// 
-			this.lblSimilarCardStatus.Location = new System.Drawing.Point(6, 16);
-			this.lblSimilarCardStatus.Name = "lblSimilarCardStatus";
-			this.lblSimilarCardStatus.Size = new System.Drawing.Size(582, 90);
-			this.lblSimilarCardStatus.TabIndex = 3;
-			this.lblSimilarCardStatus.Text = "Loading Similar Cards...";
-			this.lblSimilarCardStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
-			// lblSimilarSeperator
-			// 
-			this.lblSimilarSeperator.AutoSize = true;
-			this.lblSimilarSeperator.Location = new System.Drawing.Point(71, 0);
-			this.lblSimilarSeperator.Name = "lblSimilarSeperator";
-			this.lblSimilarSeperator.Size = new System.Drawing.Size(10, 13);
-			this.lblSimilarSeperator.TabIndex = 4;
-			this.lblSimilarSeperator.Text = "-";
-			// 
-			// lblSimilarCardCount
-			// 
-			this.lblSimilarCardCount.AutoSize = true;
-			this.lblSimilarCardCount.Location = new System.Drawing.Point(87, 0);
-			this.lblSimilarCardCount.Name = "lblSimilarCardCount";
-			this.lblSimilarCardCount.Size = new System.Drawing.Size(134, 13);
-			this.lblSimilarCardCount.TabIndex = 5;
-			this.lblSimilarCardCount.Text = "%CARDSIMILARCOUNT%";
-			// 
 			// frmViewCard
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(618, 735);
+			this.ClientSize = new System.Drawing.Size(1214, 419);
 			this.Controls.Add(this.gbSimilarCards);
 			this.Controls.Add(this.gbPriceHistory);
 			this.Controls.Add(this.gbCardDetails);

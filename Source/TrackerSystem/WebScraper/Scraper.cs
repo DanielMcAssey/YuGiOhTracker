@@ -64,20 +64,29 @@ namespace TrackerSystem.WebScraper
 			mTracker.UpdaterSystem.TriggerDataChange();
 			for (int i = 0; i < webDeckUpdateLinks.Count; i++) //For each bundle
 			{
-				HtmlDocument webDocument = webGet.Load(webScrapeURL + webDeckUpdateLinks[i].Link + "&mode=2");
+				HtmlDocument webDocument = null;
+
+				try
+				{
+					webDocument = webGet.Load(webScrapeURL + webDeckUpdateLinks[i].Link + "&mode=2");
+				}
+				catch (Exception ex)
+				{
+					//Catch exception
+				}
 
 				if (webDocument != null) //Make sure web document has loaded correctly
 				{
 					HtmlNodeCollection cardListRows = webDocument.DocumentNode.SelectNodes("//div[@id='search_result']/table/tr[@class='row']");
 					bool updateBundle = false;
-					for(int j = 0; j < cardListRows.Count; j++) //For each card
+					for (int j = 0; j < cardListRows.Count; j++) //For each card
 					{
 						string cardLink = cardListRows[j].SelectSingleNode("td[2]/input").Attributes["value"].Value.Replace("card_search.action", "");
 						NameValueCollection cardQuery = HttpUtility.ParseQueryString(cardLink);
 						int cardID = Convert.ToInt32(cardQuery["cid"]);
-						if(cardIDList.Contains(cardID) == false) //Only accept new ID's to prevent unnecesary scraping.
+						if (cardIDList.Contains(cardID) == false) //Only accept new ID's to prevent unnecesary scraping.
 						{
-							if(!updateBundle)
+							if (!updateBundle)
 								updateBundle = true;
 
 							cardIDList.Add(cardID);
@@ -107,12 +116,23 @@ namespace TrackerSystem.WebScraper
 			mTracker.UpdaterSystem.TriggerDataChange();
 			for (int i = 0; i < cardIDs.Count; i++) //For each card
 			{
-				HtmlDocument webDocument = webGet.Load(webScrapeURL + "card_search.action?ope=2&cid=" + cardIDs[i].ToString());
-				//Remove comments, if not it breaks parsing
-				webDocument.DocumentNode.Descendants().Where(n => n.NodeType == HtmlAgilityPack.HtmlNodeType.Comment).ToList().ForEach(n => n.Remove());
+				HtmlDocument webDocument = null;
+
+				try
+				{
+					webGet.Load(webScrapeURL + "card_search.action?ope=2&cid=" + cardIDs[i].ToString());
+				}
+				catch (Exception ex)
+				{
+					//Catch exception
+				}
 
 				if (webDocument != null) //Make sure web document has loaded correctly
 				{
+					//Remove comments, if not it breaks parsing
+					webDocument.DocumentNode.Descendants().Where(n => n.NodeType == HtmlAgilityPack.HtmlNodeType.Comment).ToList().ForEach(n => n.Remove());
+
+
 					CardType cardType = CardType.Monster;
 					string cardName = webDocument.DocumentNode.SelectSingleNode("//header[@id='broad_title']/div/h1").InnerText.Trim();
 					string cardDescription = "";
@@ -125,7 +145,7 @@ namespace TrackerSystem.WebScraper
 					CardAttribute cardAttribute = CardAttribute.None;
 					string cardAttack = "0";
 					string cardDefence = "0";
-					
+
 					//Spell/Trap Specific
 					CardIcon cardIcon = CardIcon.None;
 
@@ -144,7 +164,7 @@ namespace TrackerSystem.WebScraper
 							}
 							else if (rowType == "Card Text")
 							{
-								if(cardSubType == CardSubType.Xyz)
+								if (cardSubType == CardSubType.Xyz)
 								{
 									rowValue = cardDetailRows[j].SelectSingleNode("div[1]/text()[2]").InnerText.Trim();
 
@@ -153,7 +173,7 @@ namespace TrackerSystem.WebScraper
 										rowValue += "\n" + dataNode.InnerText.Trim();
 
 									dataNode = cardDetailRows[j].SelectSingleNode("div[1]/text()[4]");
-									if(dataNode != null)
+									if (dataNode != null)
 										rowValue += "\n" + dataNode.InnerText.Trim();
 
 								}
@@ -175,9 +195,9 @@ namespace TrackerSystem.WebScraper
 						}
 
 						//Need to find a better way to find out if its a monster or a trap/spell
-						if(cardDetailRows.Count > 2) //Monster
+						if (cardDetailRows.Count > 2) //Monster
 						{
-							
+
 							cardType = CardType.Monster;
 							switch (rowType)
 							{
@@ -227,10 +247,10 @@ namespace TrackerSystem.WebScraper
 							Regex specialCharacters = new Regex("[^a-zA-Z0-9 -]");
 							string cleanRowValue = specialCharacters.Replace(rowValue, "").Replace("-", ""); //Remove all special characters
 							string[] cardData = cleanRowValue.Split(' ');
-							if(cardData.Length == 2)
+							if (cardData.Length == 2)
 							{
 								cardDataIcon = cardData[0];
-								if(cardData[1] == "Spell")
+								if (cardData[1] == "Spell")
 								{
 									cardType = CardType.Spell;
 								}
@@ -240,7 +260,7 @@ namespace TrackerSystem.WebScraper
 								}
 							}
 
-							switch(rowType)
+							switch (rowType)
 							{
 								case "Icon":
 									if (rowValue.Length > 0)
@@ -311,7 +331,7 @@ namespace TrackerSystem.WebScraper
 							cardRarity = EnumUtils.ParseEnum<CardRarity>(rarityText); //Need to change to TryParse
 						}
 
-						if(!mTracker.GetCardExists(cardIDs[i], cardCode, cardRarity.ToString())) //Only allow new cards to be added.
+						if (!mTracker.GetCardExists(cardIDs[i], cardCode, cardRarity.ToString())) //Only allow new cards to be added.
 						{
 							string setQueryString = cardPackRows[j].SelectSingleNode("td[3]/input").Attributes["value"].Value.Replace("card_search.action", "");
 							NameValueCollection cardQuery = HttpUtility.ParseQueryString(setQueryString);
@@ -363,7 +383,16 @@ namespace TrackerSystem.WebScraper
 
 		public bool CheckUpdate()
 		{
-			HtmlDocument webDocument = webGet.Load(webScrapeURL + "card_list.action");
+			HtmlDocument webDocument = null;
+
+			try
+			{
+				webDocument = webGet.Load(webScrapeURL + "card_list.action");
+			}
+			catch (Exception ex)
+			{
+				//Catch exception
+			}
 
 			if (webDocument != null) //Make sure web document has loaded correctly
 			{
@@ -384,7 +413,7 @@ namespace TrackerSystem.WebScraper
 								string parseYear = cardListBody[k].InnerText.Substring(8); //Need a more automated substring way of removing double chevrons
 								bool parseYearResult = Int32.TryParse(parseYear, out currentYear);
 							}
-							else if(cardListBody[k].Attributes["class"].Value == "toggle") //Is bundle
+							else if (cardListBody[k].Attributes["class"].Value == "toggle") //Is bundle
 							{
 								HtmlNodeCollection cardListBundles = cardListBody[k].SelectNodes("div[@class='pack pack_en']");
 								for (int l = 0; l < cardListBundles.Count; l++) //Each Bundle
@@ -422,7 +451,7 @@ namespace TrackerSystem.WebScraper
 
 		private void CheckUpdatePart2(ref List<ScraperBundleToUpdate> bundlesToUpdate, ref HtmlDocument webDocument)
 		{
-			if(bundlesToUpdate != null && webDocument != null)
+			if (bundlesToUpdate != null && webDocument != null)
 			{
 				HtmlNodeCollection cardListRows = webDocument.DocumentNode.SelectNodes("//div[@id='card_list_2']/table/tr");
 				for (int i = 0; i < cardListRows.Count; i++) //Get Table Rows
@@ -467,7 +496,16 @@ namespace TrackerSystem.WebScraper
 
 		private void UpdateBanList() //Update banned and forbidden list
 		{
-			HtmlDocument webDocument = webGet.Load(webScrapeURL + "forbidden_limited.action");
+			HtmlDocument webDocument = null;
+
+			try
+			{
+				webDocument = webGet.Load(webScrapeURL + "forbidden_limited.action");
+			}
+			catch (Exception ex)
+			{
+				//Catch exception
+			}
 
 			if (webDocument != null) //Make sure web document has loaded correctly
 			{
@@ -490,7 +528,7 @@ namespace TrackerSystem.WebScraper
 							currentStatus = CardStatus.SemiLimited;
 
 						HtmlNodeCollection cardList = cardTables[i].SelectNodes("td/div[@class='forbidden_limited_list radius_top']/table/tr[@class='row']");
-						for(int j = 0; j < cardList.Count; j++)
+						for (int j = 0; j < cardList.Count; j++)
 						{
 							string setQueryString = cardList[j].SelectSingleNode("td[2]/a").Attributes["href"].Value.Replace("card_search.action", "");
 							NameValueCollection cardQuery = HttpUtility.ParseQueryString(setQueryString);

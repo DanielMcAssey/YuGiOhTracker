@@ -174,6 +174,16 @@ namespace YuGiOhTracker
 			else
 			{
 				lblPriceStatus.Text = "Error: Couldnt load price data (Server may be unavailable?)";
+				txtPriceAverage.Enabled = false;
+				txtPriceHigh.Enabled = false;
+				txtPriceLow.Enabled = false;
+				txtShift1.Enabled = false;
+				txtShift180.Enabled = false;
+				txtShift3.Enabled = false;
+				txtShift30.Enabled = false;
+				txtShift365.Enabled = false;
+				txtShift7.Enabled = false;
+				txtShift90.Enabled = false;
 			}
 		}
 
@@ -288,7 +298,6 @@ namespace YuGiOhTracker
 				lblRarityText.Text = "Common";
 			else
 				lblRarityText.Text = Tracker.AddSpacesToSentence(currentCard.Rarity.ToString(), false) + " Rare";
-
 
 			lblCardCode.Text = currentCard.Code;
 
@@ -415,7 +424,9 @@ namespace YuGiOhTracker
 				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Forbidden")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Red);
 				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (1 card)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Orange);
 				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (2 cards)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Yellow);
-				lblSimilarCardCount.Text = dgvCardList.RowCount.ToString() + " similar cards";
+                dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["code"].Value.ToString().Equals(currentCard.Code) && w.Cells["rarity"].Value.ToString().Equals(lblRarityText.Text)).ToList().ForEach(f => f.Visible = false);
+                
+                lblSimilarCardCount.Text = dgvCardList.RowCount.ToString() + " similar cards";
 			}
 			else
 			{

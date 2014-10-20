@@ -14,4 +14,11 @@ namespace TrackerSystem.CardData
 		public string Name;
 		public bool IsUpdated;
 	}
+
+	public struct UserCardBundle
+	{
+		public int ID;
+		public string BundleName;
+		public int CardCount;
+	}
 }

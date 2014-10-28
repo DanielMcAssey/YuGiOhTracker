@@ -26,7 +26,6 @@ namespace YuGiOhTracker
 		#region "Generic Worker Stuff"
 		BackgroundWorker searchWorker = null;
 		BackgroundWorker refreshDataWorker = null;
-		BackgroundWorker refreshUserWorker = null;
 
 		private void InitializeWorkers()
 		{
@@ -41,12 +40,6 @@ namespace YuGiOhTracker
 			refreshDataWorker.DoWork += DoRefreshDataWork;
 			refreshDataWorker.ProgressChanged += WorkerProgressChanged;
 			refreshDataWorker.RunWorkerCompleted += RefreshDataWorkCompleted;
-
-			refreshUserWorker = new BackgroundWorker();
-			refreshUserWorker.WorkerReportsProgress = true;
-			refreshUserWorker.DoWork += DoRefreshUserWork;
-			refreshUserWorker.ProgressChanged += WorkerProgressChanged;
-			refreshUserWorker.RunWorkerCompleted += RefreshUserWorkCompleted;
 		}
 
 		private void WorkerProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -72,6 +65,10 @@ namespace YuGiOhTracker
 					return this.SearchOfficialSetList(searchData);
 				case "cards":
 					return this.SearchCardList(searchData);
+				case "usercards":
+					return this.SearchUserList(searchData);
+				case "usersets":
+					return this.SearchUserSetList(searchData);
 				default:
 					return -1;
 			}
@@ -91,72 +88,6 @@ namespace YuGiOhTracker
 			else
 			{
 				MessageBox.Show("We could not find anything matching your search parameters.", "No Match Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
-		}
-		#endregion
-
-		#region "Refresh User Worker"
-		private void DoRefreshUserWork(object sender, DoWorkEventArgs e)
-		{
-			ssMainStatus.Text = "Reloading Data...";
-			e.Result = RefreshUserViews();
-		}
-
-		private void RefreshUserWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
-		{
-			RefreshData newRefreshData = (RefreshData)e.Result;
-			dgvUserCollection.DataSource = newRefreshData.CardListData;
-
-			//Card List
-			dgvUserCollection.Columns["level"].HeaderCell = levelHeader;
-
-			dgvUserCollection.Columns["code"].HeaderText = "Card Code";
-			dgvUserCollection.Columns["rarity"].HeaderText = "Rarity";
-			dgvUserCollection.Columns["name"].HeaderText = "Name";
-			dgvUserCollection.Columns["description"].HeaderText = "Description";
-			dgvUserCollection.Columns["level"].HeaderText = "";
-			dgvUserCollection.Columns["type"].HeaderText = "Type";
-			dgvUserCollection.Columns["attribute"].HeaderText = "Attribute";
-			dgvUserCollection.Columns["subtype"].HeaderText = "Monster Property";
-			dgvUserCollection.Columns["sticon"].HeaderText = "Spell/Trap Property";
-			dgvUserCollection.Columns["atk"].HeaderText = "ATK";
-			dgvUserCollection.Columns["def"].HeaderText = "DEF";
-
-			dgvUserCollection.Columns["code"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-			dgvUserCollection.Columns["rarity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-			dgvUserCollection.Columns["name"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-			dgvUserCollection.Columns["description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-			dgvUserCollection.Columns["level"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-			dgvUserCollection.Columns["type"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-			dgvUserCollection.Columns["attribute"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-			dgvUserCollection.Columns["subtype"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-			dgvUserCollection.Columns["sticon"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-			dgvUserCollection.Columns["atk"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-			dgvUserCollection.Columns["def"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-
-			dgvUserCollection.Columns["id"].Visible = false;
-
-			//Set list
-			ssMainStatus.Text = "Reload Completed.";
-		}
-
-
-		private RefreshData RefreshUserViews()
-		{
-			RefreshData newRefreshData = new RefreshData();
-			refreshDataWorker.ReportProgress(0);
-			//newRefreshData.SetListData = objDBManager.FindAllBundlesDT(); //TODO
-			refreshDataWorker.ReportProgress(50);
-			//newRefreshData.CardListData = objDBManager.FindAllCardsDT();
-			refreshDataWorker.ReportProgress(100);
-			return newRefreshData;
-		}
-
-		private void StartRefrehsUsers()
-		{
-			if (refreshDataWorker != null)
-			{
-				//refreshDataWorker.RunWorkerAsync();
 			}
 		}
 		#endregion
@@ -248,6 +179,16 @@ namespace YuGiOhTracker
 				dgvLimitedCards.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (2 cards)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Yellow);
 			}
 
+			if (newRefreshData.RefreshWhat.Contains("dgvUserCollection") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				//Todo
+			}
+
+			if (newRefreshData.RefreshWhat.Contains("dgvUserDecks") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				//Todo
+			}
+
 			//Other stuff
 			if (dgvCardList.RowCount == 0)
 				ssCardCount.Text = "No cards found";
@@ -269,16 +210,28 @@ namespace YuGiOhTracker
 				newRefreshData.SetListData = objDBManager.FindAllBundlesDT();
 			}
 
-			refreshDataWorker.ReportProgress(30);
+			refreshDataWorker.ReportProgress(20);
 			if (newRefreshData.RefreshWhat.Contains("dgvLimitedCards") || newRefreshData.RefreshWhat.Contains("*"))
 			{
 				newRefreshData.LimitedListData = objDBManager.FindAllBannedCardsDT();
 			}
 
-			refreshDataWorker.ReportProgress(60);
+			refreshDataWorker.ReportProgress(40);
 			if (newRefreshData.RefreshWhat.Contains("dgvCardList") || newRefreshData.RefreshWhat.Contains("*"))
 			{
 				newRefreshData.CardListData = objDBManager.FindAllCardsDT();
+			}
+
+			refreshDataWorker.ReportProgress(60);
+			if (newRefreshData.RefreshWhat.Contains("dgvUserCollection") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				newRefreshData.UserSetListData = objDBManager.FindAllCardsDT();
+			}
+
+			refreshDataWorker.ReportProgress(80);
+			if (newRefreshData.RefreshWhat.Contains("dgvUserDecks") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				newRefreshData.UserListData = objDBManager.FindAllUserCardsDT();
 			}
 
 			refreshDataWorker.ReportProgress(100);
@@ -297,7 +250,6 @@ namespace YuGiOhTracker
 		#region "Helper Functions"
 		private void PopulateCombobox()
 		{
-
 			//Card List
 			//-Card List (IN)
 			ComboboxItem cbItem = new ComboboxItem();
@@ -368,22 +320,28 @@ namespace YuGiOhTracker
 			cbSearchCardType.SelectedIndex = 0;
 			cbSearchLimitedCardType.SelectedIndex = 0;
 
-			//Official Decks
+			//Deck List
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Set Type";
 			cbItem.Value = "type";
 			cbSearchInOfficial.Items.Add(cbItem);
+			cbSearchInUser.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Year";
 			cbItem.Value = "year";
 			cbSearchInOfficial.Items.Add(cbItem);
+			cbSearchInUser.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Set Name";
 			cbItem.Value = "name";
 			cbSearchInOfficial.Items.Add(cbItem);
+			cbSearchInUser.Items.Add(cbItem);
+
 			cbSearchInOfficial.SelectedIndex = 0;
+			cbSearchInUser.SelectedIndex = 0;
+			
 		}
 
 		private void ViewCard(int rowIndex, ref DataGridView dgv)
@@ -415,6 +373,20 @@ namespace YuGiOhTracker
 			}
 		}
 
+		public void ViewUserSet(int rowIndex)
+		{
+			if (rowIndex >= 0 && rowIndex < dgvUserDecks.RowCount)
+			{
+				dgvUserDecks.Rows[rowIndex].Selected = true;
+				if (dgvUserDecks.Columns["id"] != null)
+				{
+					int setID = Convert.ToInt32(dgvUserDecks.Rows[rowIndex].Cells["id"].Value.ToString());
+					frmViewSet SetViewForm = new frmViewSet(this.objDBManager, setID, false); //TODO
+					SetViewForm.Show();
+				}
+			}
+		}
+
 		public void AddCard(int rowIndex)
 		{
 			if (rowIndex >= 0 && rowIndex < dgvCardList.RowCount)
@@ -424,12 +396,47 @@ namespace YuGiOhTracker
 			}
 		}
 
+		public void AddCardByCode(string cardCode)
+		{
+			mTracker.AddCardToCollection(cardCode);
+		}
+
 		public void AddSet(int rowIndex)
 		{
 			if (rowIndex >= 0 && rowIndex < dgvOfficialDecks.RowCount)
 			{
 				int setWebID = Convert.ToInt32(dgvCardList.Rows[rowIndex].Cells["webid"].Value.ToString());
 				mTracker.AddSetToCollection(setWebID);
+			}
+		}
+
+		public void NewUserSet()
+		{
+			//TODO
+		}
+
+		public void RemoveUserCard(int rowIndex)
+		{
+			if (rowIndex >= 0 && rowIndex < dgvCardList.RowCount)
+			{
+				if (dgvUserDecks.Columns["id"] != null)
+				{
+					int cardID = Convert.ToInt32(dgvUserDecks.Rows[rowIndex].Cells["id"].Value.ToString());
+					//TODO
+				}
+			}
+		}
+
+		public void RemoveUserSet(int rowIndex)
+		{
+			if (rowIndex >= 0 && rowIndex < dgvUserDecks.RowCount)
+			{
+				dgvUserDecks.Rows[rowIndex].Selected = true;
+				if (dgvUserDecks.Columns["id"] != null)
+				{
+					int setID = Convert.ToInt32(dgvUserDecks.Rows[rowIndex].Cells["id"].Value.ToString());
+					//TODO
+				}
 			}
 		}
 		#endregion
@@ -583,6 +590,61 @@ namespace YuGiOhTracker
 		}
 		#endregion
 
+		#region "User Set List (Search)"
+		private void btnSearchUser_Click(object sender, EventArgs e)
+		{
+			SearchData sendSearchData = new SearchData();
+			sendSearchData.SearchDGV = "usersets";
+			sendSearchData.SearchText = txtSearchUser.Text;
+			sendSearchData.Box1Text = (cbSearchInUser.SelectedItem as ComboboxItem).Value.ToString();
+			searchWorker.RunWorkerAsync(sendSearchData);
+		}
+
+		private void txtSearchUser_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				SearchData sendSearchData = new SearchData();
+				sendSearchData.SearchDGV = "usersets";
+				sendSearchData.SearchText = txtSearchUser.Text;
+				sendSearchData.Box1Text = (cbSearchInUser.SelectedItem as ComboboxItem).Value.ToString();
+				searchWorker.RunWorkerAsync(sendSearchData);
+			}
+		}
+
+		private int SearchUserSetList(SearchData searchData)
+		{
+			int rowIndex = -1;
+			double rowCount = dgvUserDecks.RowCount;
+
+			if (dgvUserDecks.Columns[searchData.Box1Text] != null)
+			{
+				double currentRowNumber = 0;
+				foreach (DataGridViewRow row in dgvUserDecks.Rows)
+				{
+					if (row.Cells[searchData.Box1Text].Value.ToString().Contains(searchData.SearchText))
+					{
+						rowIndex = row.Index;
+						break;
+					}
+					currentRowNumber += 1;
+
+					if (searchWorker.IsBusy)
+					{
+						int progressPercentage = Convert.ToInt32(Math.Round((currentRowNumber / rowCount) * 100));
+						searchWorker.ReportProgress(progressPercentage);
+					}
+				}
+			}
+
+			if (rowIndex >= 0)
+				return rowIndex;
+			else
+				return -1;
+
+		}
+		#endregion
+
 		#region "Limited List (Search)"
 		private void btnSearchLimitedCards_Click(object sender, EventArgs e)
 		{
@@ -694,6 +756,20 @@ namespace YuGiOhTracker
 			else
 				return -1;
 
+		}
+		#endregion
+
+		#region "User Collection List (Generic)
+		private void btnUserCollectionAdd_Click(object sender, EventArgs e)
+		{
+			string cardsToAdd = txtUserCollectionAdd.Text;
+			Regex.Replace(cardsToAdd, @"\s+", "");
+			List<string> cardCodes = cardsToAdd.Split(',').ToList<string>();
+
+			for (int i = 0; i < cardCodes.Count; i++)
+			{
+				AddCardByCode(cardCodes[i]);
+			}
 		}
 		#endregion
 
@@ -882,14 +958,83 @@ namespace YuGiOhTracker
 			}
 		}
 
-		protected void cmRemoveCardUser(Object sender, EventArgs e)
-		{
-			ViewCard(selectedIndex, ref dgvUserCollection); //TODO
-		}
-
 		protected void cmViewCardUser(Object sender, EventArgs e)
 		{
 			ViewCard(selectedIndex, ref dgvUserCollection);
+		}
+
+		protected void cmRemoveCardUser(Object sender, EventArgs e)
+		{
+			RemoveUserCard(selectedIndex);
+		}
+		#endregion
+
+		#region "User Set List (DGV)"
+		private void dgvUserDecks_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+		{
+			ViewUserSet(e.RowIndex);
+		}
+
+		private void dgvUserDecks_MouseClick(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				ContextMenu cm = new ContextMenu();
+				cm.MenuItems.Add(new MenuItem("New Deck...", new EventHandler(cmNewDeckUser)));
+				cm.Show(dgvUserDecks, new Point(e.X, e.Y));
+			}
+		}
+
+		private void dgvUserDecks_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				int currentMouseOverRow = dgvUserDecks.HitTest(e.X, e.Y).RowIndex;
+				
+				if (currentMouseOverRow >= 0)
+				{
+					ContextMenu cm = new ContextMenu();
+					cm.MenuItems.Add(new MenuItem("View Deck...", new EventHandler(cmViewDeckUser)));
+					cm.MenuItems.Add(new MenuItem("Remove Deck", new EventHandler(cmRemoveDeckUser)));
+
+					selectedIndex = currentMouseOverRow;
+					dgvUserDecks.CurrentCell = dgvUserDecks.Rows[currentMouseOverRow].Cells["deckName"];
+					dgvUserDecks.Rows[currentMouseOverRow].Selected = true;
+
+					cm.MenuItems.Add(new MenuItem("New Deck...", new EventHandler(cmNewDeckUser)));
+					cm.Show(dgvUserDecks, new Point(e.X, e.Y));
+				}
+			}
+		}
+
+		private void dgvUserDecks_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				foreach (DataGridViewRow row in dgvUserDecks.SelectedRows)
+				{
+					ViewUserSet(selectedIndex);
+				}
+
+				e.Handled = true;
+			}
+		}
+
+		protected void cmViewDeckUser(Object sender, EventArgs e)
+		{
+			ViewUserSet(selectedIndex);
+		}
+
+		protected void cmNewDeckUser(Object sender, EventArgs e)
+		{
+			NewUserSet();
+		}
+
+		protected void cmRemoveDeckUser(Object sender, EventArgs e)
+		{
+			DialogResult removeDialog = MessageBox.Show("Are you sure you want to delete this deck?", "Delete Deck", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+			if (removeDialog == DialogResult.Yes)
+				RemoveUserSet(selectedIndex);
 		}
 		#endregion
 
@@ -922,8 +1067,11 @@ namespace YuGiOhTracker
 			switch (tcMain.SelectedIndex)
 			{
 				case 0: //Card List //No need for refresh unless its by an update or form load.
-					//refreshData.Add("dgvCardList");
-					//StartRefrehsData(refreshData);
+					if (dgvCardList.RowCount == 0) //No need for refresh unless its by an update or form load.
+					{
+						refreshData.Add("dgvCardList");
+						StartRefrehsData(refreshData);
+					}
 					break;
 				case 1: //Official Decks
 					if (dgvOfficialDecks.RowCount == 0) //No need for refresh unless its by an update or form load.
@@ -933,10 +1081,18 @@ namespace YuGiOhTracker
 					}
 					break;
 				case 2: //User Collection
-
+					if (dgvUserCollection.RowCount == 0) //No need for refresh unless its by an update.
+					{
+						refreshData.Add("dgvUserCollection");
+						StartRefrehsData(refreshData);
+					}
 					break;
 				case 3: //User Decks
-
+					if (dgvUserDecks.RowCount == 0) //No need for refresh unless its by an update.
+					{
+						refreshData.Add("dgvUserDecks");
+						StartRefrehsData(refreshData);
+					}
 					break;
 				case 4: //Limited Cards 
 					if (dgvLimitedCards.RowCount == 0) //No need for refresh unless its by an update.
@@ -947,16 +1103,5 @@ namespace YuGiOhTracker
 					break;
 			}
 		}
-
-		private void btnUserCollectionAdd_Click(object sender, EventArgs e)
-		{
-
-		}
-
-		
-
-		
-
-		
 	}
 }

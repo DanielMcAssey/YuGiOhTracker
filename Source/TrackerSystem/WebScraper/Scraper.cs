@@ -120,7 +120,7 @@ namespace TrackerSystem.WebScraper
 
 				try
 				{
-					webGet.Load(webScrapeURL + "card_search.action?ope=2&cid=" + cardIDs[i].ToString());
+					webDocument = webGet.Load(webScrapeURL + "card_search.action?ope=2&cid=" + cardIDs[i].ToString());
 				}
 				catch (Exception ex)
 				{
@@ -131,7 +131,6 @@ namespace TrackerSystem.WebScraper
 				{
 					//Remove comments, if not it breaks parsing
 					webDocument.DocumentNode.Descendants().Where(n => n.NodeType == HtmlAgilityPack.HtmlNodeType.Comment).ToList().ForEach(n => n.Remove());
-
 
 					CardType cardType = CardType.Monster;
 					string cardName = webDocument.DocumentNode.SelectSingleNode("//header[@id='broad_title']/div/h1").InnerText.Trim();
@@ -161,6 +160,11 @@ namespace TrackerSystem.WebScraper
 							{
 								dataNode = cardDetailRows[j].SelectSingleNode("div[1]/text()[3]");
 								rowValue = dataNode.InnerText.Trim();
+								if(rowValue == "/") //Fix for error on page showing incorrect data.
+								{
+									dataNode = cardDetailRows[j].SelectSingleNode("div[1]/text()[4]");
+									rowValue = dataNode.InnerText.Trim();
+								}
 							}
 							else if (rowType == "Card Text")
 							{
@@ -194,10 +198,11 @@ namespace TrackerSystem.WebScraper
 							rowValue = dataNode.InnerText.Trim();
 						}
 
+						System.Diagnostics.Debug.WriteLine(cardName + ": " + rowType.ToString() + " - " + rowValue.ToString());
+
 						//Need to find a better way to find out if its a monster or a trap/spell
 						if (cardDetailRows.Count > 2) //Monster
 						{
-
 							cardType = CardType.Monster;
 							switch (rowType)
 							{
@@ -290,7 +295,6 @@ namespace TrackerSystem.WebScraper
 							Directory.CreateDirectory(Tracker.CardImageDir + cardIDs[i].ToString());
 						}
 
-
 						for (int j = 0; j < cardFrames.Count; j++) //Get images for each image available
 						{
 							int currentImageID = Convert.ToInt32(cardFrames[j].Attributes["alt"].Value);
@@ -377,7 +381,6 @@ namespace TrackerSystem.WebScraper
 				mTracker.UpdaterSystem.TriggerDataChange();
 			}
 
-			UpdateBanList(); //Update banlist with new cards.
 			return bundleSets;
 		}
 
@@ -437,8 +440,8 @@ namespace TrackerSystem.WebScraper
 				}
 
 				CheckUpdatePart2(ref listBundles, ref webDocument);
-				UpdateBanList(); // Update Banned and Forbidden cards
 				webDeckUpdateLinks = mTracker.CompareBundles(listBundles);
+				UpdateBanList(); // Update Banned and Forbidden cards
 
 				if (webDeckUpdateLinks.Count > 0)
 					return true; //New bundles!
@@ -494,7 +497,7 @@ namespace TrackerSystem.WebScraper
 			}
 		}
 
-		private void UpdateBanList() //Update banned and forbidden list
+		public void UpdateBanList() //Update banned and forbidden list
 		{
 			HtmlDocument webDocument = null;
 

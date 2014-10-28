@@ -97,6 +97,7 @@
 			this.pbCards.Location = new System.Drawing.Point(6, 32);
 			this.pbCards.Name = "pbCards";
 			this.pbCards.Size = new System.Drawing.Size(578, 23);
+			this.pbCards.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
 			this.pbCards.TabIndex = 3;
 			// 
 			// lblStatus

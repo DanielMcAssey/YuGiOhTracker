@@ -42,6 +42,8 @@ namespace TrackerSystem
 		public DataTable CardListData;
 		public DataTable SetListData;
 		public DataTable LimitedListData;
+		public DataTable UserListData;
+		public DataTable UserSetListData;
 	}
 
     public class Tracker

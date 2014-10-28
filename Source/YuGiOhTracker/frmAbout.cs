@@ -22,7 +22,7 @@ namespace YuGiOhTracker
 				txtLicence.Text = File.ReadAllText("LICENSE");
 			}
 			else
-				txtLicence.Text = "MIT License should be here. :(" + Environment.NewLine + "Cant load 'LICENSE' file.";
+				txtLicence.Text = "Software license should be here. :(" + Environment.NewLine + "Cant load 'LICENSE' file.";
 		}
 
 		private void lnklblGitHub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

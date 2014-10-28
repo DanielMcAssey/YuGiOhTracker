@@ -119,6 +119,9 @@ namespace TrackerSystem.Updater
 				this.completedCardCount += 1;
 				TriggerDataChange();
 			}
+
+			mScraper.UpdateBanList(); //Update banlist with new cards.
+
 			currentStatus = "Completed: A total of " + newCards.SetIDToUpdate.Count.ToString() + " new sets have been added.";
 			TriggerDataChange();
 		}

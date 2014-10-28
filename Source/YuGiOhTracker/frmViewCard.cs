@@ -265,7 +265,11 @@ namespace YuGiOhTracker
 			priceLoaderWorker.WorkerReportsProgress = false;
 			priceLoaderWorker.DoWork += DoLoadPricesWork;
 			priceLoaderWorker.RunWorkerCompleted += LoadPricesWorkCompleted;
-			priceLoaderWorker.RunWorkerAsync(currentCard);
+
+			if (mDB.GetSetting("mashape_api_key").Length > 0)
+				priceLoaderWorker.RunWorkerAsync(currentCard);
+			else
+				lblPriceStatus.Text = "Error: No API key set, could not retrieve prices.";
 		}
 		#endregion
 		

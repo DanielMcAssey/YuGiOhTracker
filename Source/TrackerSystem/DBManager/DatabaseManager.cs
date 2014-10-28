@@ -73,6 +73,7 @@ namespace TrackerSystem.DBManager
 			if (seedUserTables)
 				this.SeedUserTables();
 
+			SeedUserTables();
 		}
 
 		private void SeedSystemTables()
@@ -141,11 +142,13 @@ namespace TrackerSystem.DBManager
 				//Table seeds below
 				//CREATE
 				tableSeed.Add("CREATE TABLE IF NOT EXISTS system (id VARCHAR(64) PRIMARY KEY, setting VARCHAR(64))");
-				tableSeed.Add("CREATE TABLE IF NOT EXISTS user_cards (id INT PRIMARY KEY, sysID INT)");
+				tableSeed.Add("CREATE TABLE IF NOT EXISTS user_cards (id INT PRIMARY KEY, cardCode VARCHAR(24))");
+				tableSeed.Add("CREATE TABLE IF NOT EXISTS user_decks (id INT PRIMARY KEY, deckName VARCHAR(64), lastUpdatedDate TEXT, createdDate TEXT)");
+				tableSeed.Add("CREATE TABLE IF NOT EXISTS deck_card_rel (id INT PRIMARY KEY, deckID INT, cardCode VARCHAR(24))");
 				//INSERT
-				tableSeed.Add("INSERT INTO system (id, setting) VALUES ('revision', '0')");
-				tableSeed.Add("INSERT INTO system (id, setting) VALUES ('save_count', '0')");
-				tableSeed.Add("INSERT INTO system (id, setting) VALUES ('mashape_api_key', '')");
+				//tableSeed.Add("INSERT INTO system (id, setting) VALUES ('revision', '0')");
+				//tableSeed.Add("INSERT INTO system (id, setting) VALUES ('save_count', '0')");
+				//tableSeed.Add("INSERT INTO system (id, setting) VALUES ('mashape_api_key', '')");
 
 				for (int i = 0; i < tableSeed.Count; i++)
 				{
@@ -494,7 +497,7 @@ namespace TrackerSystem.DBManager
 			{
 				dbSys.Open();
 
-				string sql = "SELECT card_bundle.id,bundle_types.text AS type,year,name,webid FROM card_bundle JOIN bundle_types ON card_bundle.type = bundle_types.stub ORDER BY card_bundle.year DESC";
+				string sql = "SELECT card_bundle.id,bundle_types.text AS type,year,name,webid FROM card_bundle JOIN bundle_types ON card_bundle.type = bundle_types.stub ORDER BY card_bundle.year DESC, card_bundle.type ASC";
 				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbSys);
 				SQLiteDataAdapter sqlDA = new SQLiteDataAdapter(sqlCMD);
 				DataSet sqlDS = new DataSet();
@@ -691,20 +694,107 @@ namespace TrackerSystem.DBManager
 			{
 				dbUser.Open();
 
-				string sql = "SELECT * FROM userdecks";
+				string sql = "SELECT * FROM user_decks";
 				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbUser);
 				SQLiteDataReader reader = sqlCMD.ExecuteReader();
+
+				string sqlCount = "SELECT * FROM deck_card_rel WHERE deckID = @paramdeckid";
+				SQLiteCommand sqlCountCMD = new SQLiteCommand(sqlCount, dbUser);
+
 				while (reader.Read())
 				{
+					sqlCountCMD.Parameters.Add(new SQLiteParameter("@paramdeckid", Convert.ToInt32(reader["id"].ToString())));
+					int cardCount = 0;
+					cardCount = Convert.ToInt32(sqlCountCMD.ExecuteScalar());
+
 					UserCardBundle tmpBundle = new UserCardBundle();
 					tmpBundle.ID = Convert.ToInt32(reader["id"].ToString());
-					tmpBundle.BundleName = reader["name"].ToString();
-					tmpBundle.CardCount = Convert.ToInt32(reader["count"].ToString());
+					tmpBundle.BundleName = reader["deckName"].ToString();
+					tmpBundle.CardCount = cardCount;
 					result.Add(tmpBundle);
 				}
 			}
 
 			return result;
+		}
+
+		public DataTable FindAllUserBundlesDT()
+		{
+			using (SQLiteConnection dbUser = new SQLiteConnection(UserConnection))
+			{
+				dbUser.Open();
+
+				string sql = "SELECT * FROM user_decks ORDER BY lastUpdatedDate DESC";
+				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbUser);
+				SQLiteDataAdapter sqlDA = new SQLiteDataAdapter(sqlCMD);
+				DataSet sqlDS = new DataSet();
+				DataTable sqlDT = null;
+
+				try
+				{
+					sqlDA.Fill(sqlDS);
+					sqlDT = sqlDS.Tables[0];
+				}
+				catch (Exception ex)
+				{
+					throw new Exception(ex.Message);
+				}
+
+				return sqlDT;
+			}
+		}
+
+		public DataTable FindAllUserCardsDT()
+		{
+			using (SQLiteConnection dbUser = new SQLiteConnection(UserConnection))
+			{
+				dbUser.Open();
+
+				string sql = "SELECT * FROM user_cards";
+				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbUser);
+				SQLiteDataAdapter sqlDA = new SQLiteDataAdapter(sqlCMD);
+				DataSet sqlDS = new DataSet();
+				DataTable sqlDT = null;
+
+				try
+				{
+					sqlDA.Fill(sqlDS);
+					sqlDT = sqlDS.Tables[0];
+				}
+				catch (Exception ex)
+				{
+					throw new Exception(ex.Message);
+				}
+
+				return sqlDT;
+			}
+		}
+
+		public void AddCard(string cardCode)
+		{
+			using (SQLiteConnection dbUser = new SQLiteConnection(UserConnection))
+			{
+				dbUser.Open();
+
+				string sql = "INSERT INTO user_cards (id,cardCode) VALUES (NULL,@paramcardcode)";
+				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbUser);
+				sqlCMD.Parameters.Add(new SQLiteParameter("@paramcardcode", cardCode));
+				sqlCMD.ExecuteNonQuery();
+			}
+		}
+
+		public void AddCardToCollection(int deckID, string cardCode)
+		{
+			using (SQLiteConnection dbUser = new SQLiteConnection(UserConnection))
+			{
+				dbUser.Open();
+
+				string sql = "INSERT INTO deck_card_rel (id,deckID,cardCode) VALUES (NULL,@paramdeckid,@paramcardcode)";
+				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbUser);
+				sqlCMD.Parameters.Add(new SQLiteParameter("@paramdeckid", deckID));
+				sqlCMD.Parameters.Add(new SQLiteParameter("@paramcardcode", cardCode));
+				sqlCMD.ExecuteNonQuery();
+			}
 		}
 	}
 }

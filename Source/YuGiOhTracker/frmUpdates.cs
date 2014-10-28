@@ -15,7 +15,10 @@ namespace YuGiOhTracker
 	public partial class frmUpdates : Form
 	{
 		private Tracker objTracker;
+
+		#region "Generic Worker Init"
 		private BackgroundWorker updateWorker;
+		private BackgroundWorker checkUpdateWorker;
 
 		private void InitializeUpdateWorker()
 		{
@@ -25,8 +28,65 @@ namespace YuGiOhTracker
 			updateWorker.ProgressChanged += UpdateWorkProgressChanged;
 			updateWorker.RunWorkerCompleted += UpdateWorkCompleted;
 			objTracker.UpdaterSystem.InformationChanged += UpdateDataChanged;
+
+			checkUpdateWorker = new BackgroundWorker();
+			checkUpdateWorker.WorkerReportsProgress = false;
+			checkUpdateWorker.DoWork += DoCheckUpdateWork;
+			checkUpdateWorker.RunWorkerCompleted += CheckUpdateWorkCompleted;
+		}
+		#endregion
+
+		#region "Check Update Worker"
+		private void StartCheckUpdateWork()
+		{
+			checkUpdateWorker.RunWorkerAsync();
 		}
 
+		private void DoCheckUpdateWork(object sender, DoWorkEventArgs e)
+		{
+			e.Result = objTracker.CheckUpdate();
+		}
+
+		private void CheckUpdateWorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+		{
+			bool updateRequired = (bool)e.Result;
+
+			if (updateRequired)
+			{
+				DialogResult msgUpdateResult = MessageBox.Show("There is an update available, would you like to download it?", "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+				if (msgUpdateResult == DialogResult.Yes)
+				{
+					lblCurrentCard.Visible = true;
+					lblCardPercentage.Visible = true;
+					lblUpdating.Visible = true;
+					pbCards.Style = ProgressBarStyle.Continuous;
+
+					DialogResult msgDownloadResult = MessageBox.Show("Would you like to download card images?\n(May take significantly longer to update)", "Download Images", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+					if (msgDownloadResult == DialogResult.Yes)
+					{
+						StartUpdateWork(true);
+					}
+					else if (msgDownloadResult == DialogResult.No)
+					{
+						StartUpdateWork(false);
+					}
+				}
+				else if (msgUpdateResult == DialogResult.No)
+				{
+					this.Close();
+				}
+			}
+			else
+			{
+				pbCards.Style = ProgressBarStyle.Continuous;
+				lblStatusText.Text = "No updates available.";
+				DialogResult msgUpdateResult = MessageBox.Show("No updates available", "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				this.Close();
+			}
+		}
+		#endregion
+
+		#region "Update Worker"
 		private void StartUpdateWork(bool downloadImages)
 		{
 			lblStatusText.Text = "Preparing: Collecting Metadata... (This may take a LONG time)";
@@ -65,6 +125,7 @@ namespace YuGiOhTracker
 				updateWorker.ReportProgress(updateProgress);
 			}
 		}
+		#endregion
 
 		public frmUpdates()
 		{
@@ -75,6 +136,10 @@ namespace YuGiOhTracker
 
 		private void frmUpdates_Load(object sender, EventArgs e)
 		{
+			lblCurrentCard.Visible = false;
+			lblCardPercentage.Visible = false;
+			lblUpdating.Visible = false;
+			pbCards.Style = ProgressBarStyle.Marquee;
 			lblCurrentCardText.Text = "";
 			lblStatusText.Text = "";
 			lblCardPercentage.Text = "";
@@ -82,39 +147,13 @@ namespace YuGiOhTracker
 
 		private void frmUpdates_Shown(object sender, EventArgs e)
 		{
-			lblStatusText.Text = "Checking for updates...";
-
-			if (objTracker.CheckUpdate())
-			{
-				DialogResult msgUpdateResult = MessageBox.Show("There is an update available, would you like to download it?", "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-				if (msgUpdateResult == DialogResult.Yes)
-				{
-					DialogResult msgDownloadResult = MessageBox.Show("Would you like to download card images?\n(May take significantly longer to update)", "Download Images", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-					if (msgDownloadResult == DialogResult.Yes)
-					{
-						StartUpdateWork(true);
-					}
-					else if (msgDownloadResult == DialogResult.No)
-					{
-						StartUpdateWork(false);
-					}
-				}
-				else if (msgUpdateResult == DialogResult.No)
-				{
-					this.Close();
-				}
-			}
-			else
-			{
-				lblStatusText.Text = "No updates available.";
-				DialogResult msgUpdateResult = MessageBox.Show("No updates available", "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				this.Close();
-			}
+			lblStatusText.Text = "Checking for updates, please wait...";
+			StartCheckUpdateWork();
 		}
 
 		private void frmUpdates_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if(updateWorker.IsBusy)
+			if (updateWorker.IsBusy)
 			{
 				DialogResult msgExit = MessageBox.Show("There is an update in progress, are you sure you want to exit?\n(You will loose all update data)", "Exit Update", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 				if (msgExit == DialogResult.Yes)

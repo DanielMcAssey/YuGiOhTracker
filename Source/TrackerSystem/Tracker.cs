@@ -129,14 +129,22 @@ namespace TrackerSystem
 			return newText.ToString();
 		}
 		
-		public void AddCardToCollection(string cardCode)
+		public bool AddCardToCollection(string cardCode)
 		{
-
+			if (mDB.GetCardExistsByCode(cardCode)) //Card exists :D
+			{
+				mDB.AddCard(cardCode);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
-		public void AddSetToCollection(int setWebID)
+		public bool AddSetToCollection(int setWebID)
 		{
-
+			return false;
 		}
     }
 }

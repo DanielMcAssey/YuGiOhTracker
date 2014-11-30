@@ -351,6 +351,24 @@ namespace TrackerSystem.DBManager
 			}
 		}
 
+		public bool GetCardExistsByCode(string cardCode)
+		{
+			using (SQLiteConnection dbSys = new SQLiteConnection(SystemConnection))
+			{
+				dbSys.Open();
+
+				bool cardExists = false;
+				string sql = "SELECT COUNT(*) FROM cards WHERE code = @cardcode";
+				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbSys);
+				sqlCMD.Parameters.Add(new SQLiteParameter("@cardcode", cardCode));
+				int rowsFound = Convert.ToInt32(sqlCMD.ExecuteScalar());
+				if (rowsFound > 0)
+					cardExists = true;
+
+				return cardExists;
+			}
+		}
+
 		public void InsertBundles(List<CardBundle> listBundles)
 		{
 			using (SQLiteConnection dbSys = new SQLiteConnection(SystemConnection))
@@ -687,6 +705,7 @@ namespace TrackerSystem.DBManager
 			}
 		}
 
+		//User DB
 		public List<UserCardBundle> GetAllUserBundles()
 		{
 			List<UserCardBundle> result = new List<UserCardBundle>();
@@ -750,8 +769,35 @@ namespace TrackerSystem.DBManager
 			{
 				dbUser.Open();
 
-				string sql = "SELECT * FROM user_cards";
-				SQLiteCommand sqlCMD = new SQLiteCommand(sql, dbUser);
+				string attachSQL = "ATTACH DATABASE @paramdbpath AS systemDB;";
+				SQLiteCommand sqlCMD = new SQLiteCommand(attachSQL, dbUser);
+				sqlCMD.Parameters.Add(new SQLiteParameter("@paramdbpath", systemDB));
+
+				try
+				{
+					sqlCMD.ExecuteNonQuery();
+				}
+				catch (Exception ex)
+				{
+					throw new Exception(ex.Message);
+				}
+				finally
+				{
+					sqlCMD.Dispose();
+				}
+
+				string sql = @"	SELECT	systemDB.cards.id,
+										systemDB.cards.code,
+										systemDB.cards.name,
+										systemDB.card_rarities.text AS rarity,
+										systemDB.cards.type,
+										systemDB.status_types.text AS status
+								FROM user_cards
+								LEFT JOIN systemDB.cards ON systemDB.cards.code = user_cards.cardCode
+								LEFT JOIN systemDB.card_rarities ON systemDB.cards.rarity = systemDB.card_rarities.stub
+								LEFT JOIN systemDB.status_types ON systemDB.cards.status = systemDB.status_types.stub
+								ORDER BY systemDB.cards.code ASC";
+				sqlCMD = new SQLiteCommand(sql, dbUser);
 				SQLiteDataAdapter sqlDA = new SQLiteDataAdapter(sqlCMD);
 				DataSet sqlDS = new DataSet();
 				DataTable sqlDT = null;
@@ -764,6 +810,26 @@ namespace TrackerSystem.DBManager
 				catch (Exception ex)
 				{
 					throw new Exception(ex.Message);
+				}
+				finally
+				{
+					sqlCMD.Dispose();
+				}
+
+				string detachSQL = "DETACH DATABASE systemDB;";
+				sqlCMD = new SQLiteCommand(detachSQL, dbUser);
+
+				try
+				{
+					sqlCMD.ExecuteNonQuery();
+				}
+				catch (Exception ex)
+				{
+					throw new Exception(ex.Message);
+				}
+				finally
+				{
+					sqlCMD.Dispose();
 				}
 
 				return sqlDT;

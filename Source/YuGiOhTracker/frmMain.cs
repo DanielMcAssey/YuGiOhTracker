@@ -103,6 +103,10 @@ namespace YuGiOhTracker
 		{
 			RefreshData newRefreshData = (RefreshData)e.Result;
 
+			//////////////////////////////
+			// Refresh Data and Columns //
+			//////////////////////////////
+
 			if (newRefreshData.RefreshWhat.Contains("dgvCardList") || newRefreshData.RefreshWhat.Contains("*"))
 			{
 				//Card List
@@ -134,10 +138,6 @@ namespace YuGiOhTracker
 				dgvCardList.Columns["status"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
 
 				dgvCardList.Columns["id"].Visible = false;
-
-				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Forbidden")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Red);
-				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (1 card)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Orange);
-				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (2 cards)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Yellow);
 			}
 
 			if (newRefreshData.RefreshWhat.Contains("dgvOfficialDecks") || newRefreshData.RefreshWhat.Contains("*"))
@@ -173,7 +173,62 @@ namespace YuGiOhTracker
 				dgvLimitedCards.Columns["status"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
 
 				dgvLimitedCards.Columns["id"].Visible = false;
+			}
 
+			if (newRefreshData.RefreshWhat.Contains("dgvUserCollection") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				dgvUserCollection.DataSource = newRefreshData.UserSetListData;
+
+				dgvUserCollection.Columns["code"].HeaderText = "Card Code";
+				dgvUserCollection.Columns["name"].HeaderText = "Name";
+				dgvUserCollection.Columns["type"].HeaderText = "Type";
+				dgvUserCollection.Columns["rarity"].HeaderText = "Rarity";
+				dgvUserCollection.Columns["status"].HeaderText = "Status";
+
+				dgvUserCollection.Columns["code"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+				dgvUserCollection.Columns["name"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+				dgvUserCollection.Columns["type"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+				dgvUserCollection.Columns["rarity"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+				dgvUserCollection.Columns["status"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+
+				dgvUserCollection.Columns["id"].Visible = false;
+			}
+
+			if (newRefreshData.RefreshWhat.Contains("dgvUserDecks") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				dgvUserDecks.DataSource = newRefreshData.UserListData;
+
+				dgvUserDecks.Columns["deckName"].HeaderText = "Deck Name";
+				dgvUserDecks.Columns["lastUpdatedDate"].HeaderText = "Last Updated";
+				dgvUserDecks.Columns["createdDate"].HeaderText = "Created";
+
+				dgvUserDecks.Columns["deckName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+				dgvUserDecks.Columns["lastUpdatedDate"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+				dgvUserDecks.Columns["createdDate"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+
+				dgvUserDecks.Columns["id"].Visible = false;
+			}
+
+			////////////////
+			// Row Colors //
+			////////////////
+
+			if (newRefreshData.RefreshWhat.Contains("dgvCardList") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				//Card List
+				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Forbidden")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Red);
+				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (1 card)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Orange);
+				dgvCardList.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (2 cards)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Yellow);
+			}
+
+			if (newRefreshData.RefreshWhat.Contains("dgvOfficialDecks") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				//Set list
+			}
+
+			if (newRefreshData.RefreshWhat.Contains("dgvLimitedCards") || newRefreshData.RefreshWhat.Contains("*"))
+			{
+				//Limited List
 				dgvLimitedCards.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Forbidden")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Red);
 				dgvLimitedCards.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (1 card)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Orange);
 				dgvLimitedCards.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (2 cards)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Yellow);
@@ -181,12 +236,15 @@ namespace YuGiOhTracker
 
 			if (newRefreshData.RefreshWhat.Contains("dgvUserCollection") || newRefreshData.RefreshWhat.Contains("*"))
 			{
-				//Todo
+				//User Card List
+				dgvUserCollection.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Forbidden")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Red);
+				dgvUserCollection.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (1 card)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Orange);
+				dgvUserCollection.Rows.Cast<DataGridViewRow>().Where(w => w.Cells["status"].Value.ToString().Equals("Limited (2 cards)")).ToList().ForEach(f => f.DefaultCellStyle.BackColor = Color.Yellow);
 			}
 
 			if (newRefreshData.RefreshWhat.Contains("dgvUserDecks") || newRefreshData.RefreshWhat.Contains("*"))
 			{
-				//Todo
+				//User Set List
 			}
 
 			//Other stuff
@@ -206,33 +264,23 @@ namespace YuGiOhTracker
 
 			refreshDataWorker.ReportProgress(0);
 			if (newRefreshData.RefreshWhat.Contains("dgvOfficialDecks") || newRefreshData.RefreshWhat.Contains("*"))
-			{
 				newRefreshData.SetListData = objDBManager.FindAllBundlesDT();
-			}
 
 			refreshDataWorker.ReportProgress(20);
 			if (newRefreshData.RefreshWhat.Contains("dgvLimitedCards") || newRefreshData.RefreshWhat.Contains("*"))
-			{
 				newRefreshData.LimitedListData = objDBManager.FindAllBannedCardsDT();
-			}
 
 			refreshDataWorker.ReportProgress(40);
 			if (newRefreshData.RefreshWhat.Contains("dgvCardList") || newRefreshData.RefreshWhat.Contains("*"))
-			{
 				newRefreshData.CardListData = objDBManager.FindAllCardsDT();
-			}
 
 			refreshDataWorker.ReportProgress(60);
 			if (newRefreshData.RefreshWhat.Contains("dgvUserCollection") || newRefreshData.RefreshWhat.Contains("*"))
-			{
-				newRefreshData.UserSetListData = objDBManager.FindAllCardsDT();
-			}
+				newRefreshData.UserSetListData = objDBManager.FindAllUserCardsDT();
 
 			refreshDataWorker.ReportProgress(80);
 			if (newRefreshData.RefreshWhat.Contains("dgvUserDecks") || newRefreshData.RefreshWhat.Contains("*"))
-			{
-				newRefreshData.UserListData = objDBManager.FindAllUserCardsDT();
-			}
+				newRefreshData.UserListData = objDBManager.FindAllUserBundlesDT();
 
 			refreshDataWorker.ReportProgress(100);
 			return newRefreshData;
@@ -257,22 +305,26 @@ namespace YuGiOhTracker
 			cbItem.Value = "code";
 			cbSearchInCardList.Items.Add(cbItem);
 			cbSearchInLimited.Items.Add(cbItem);
+			cbUserCollectionIn.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Name";
 			cbItem.Value = "name";
 			cbSearchInCardList.Items.Add(cbItem);
 			cbSearchInLimited.Items.Add(cbItem);
+			cbUserCollectionIn.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Level";
 			cbItem.Value = "level";
 			cbSearchInCardList.Items.Add(cbItem);
+			cbUserCollectionIn.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Type";
 			cbItem.Value = "type";
 			cbSearchInCardList.Items.Add(cbItem);
+			cbUserCollectionIn.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Attribute";
@@ -291,6 +343,7 @@ namespace YuGiOhTracker
 
 			cbSearchInCardList.SelectedIndex = 0;
 			cbSearchInLimited.SelectedIndex = 0;
+			cbUserCollectionIn.SelectedIndex = 0;
 
 			//-Card List (Type)
 			cbItem = new ComboboxItem();
@@ -298,27 +351,32 @@ namespace YuGiOhTracker
 			cbItem.Value = "any";
 			cbSearchCardType.Items.Add(cbItem);
 			cbSearchLimitedCardType.Items.Add(cbItem);
+			cbUserCollectionCardType.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Monster";
 			cbItem.Value = "monster";
 			cbSearchCardType.Items.Add(cbItem);
 			cbSearchLimitedCardType.Items.Add(cbItem);
+			cbUserCollectionCardType.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Spell";
 			cbItem.Value = "spell";
 			cbSearchCardType.Items.Add(cbItem);
 			cbSearchLimitedCardType.Items.Add(cbItem);
+			cbUserCollectionCardType.Items.Add(cbItem);
 
 			cbItem = new ComboboxItem();
 			cbItem.Text = "Trap";
 			cbItem.Value = "trap";
 			cbSearchCardType.Items.Add(cbItem);
 			cbSearchLimitedCardType.Items.Add(cbItem);
+			cbUserCollectionCardType.Items.Add(cbItem);
 
 			cbSearchCardType.SelectedIndex = 0;
 			cbSearchLimitedCardType.SelectedIndex = 0;
+			cbUserCollectionCardType.SelectedIndex = 0;
 
 			//Deck List
 			cbItem = new ComboboxItem();
@@ -392,13 +450,22 @@ namespace YuGiOhTracker
 			if (rowIndex >= 0 && rowIndex < dgvCardList.RowCount)
 			{
 				string cardCode = dgvCardList.Rows[rowIndex].Cells["code"].Value.ToString();
-				mTracker.AddCardToCollection(cardCode);
+				AddCardByCode(cardCode);
 			}
 		}
 
 		public void AddCardByCode(string cardCode)
 		{
-			mTracker.AddCardToCollection(cardCode);
+			if(!mTracker.AddCardToCollection(cardCode))
+			{
+				MessageBox.Show("Could not add \"" + cardCode + "\", card may not exist in the current database.", "Add Card - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+			else
+			{
+				List<string> refreshData = new List<string>();
+				refreshData.Add("dgvUserCollection");
+				StartRefrehsData(refreshData);
+			}
 		}
 
 		public void AddSet(int rowIndex)
@@ -406,7 +473,16 @@ namespace YuGiOhTracker
 			if (rowIndex >= 0 && rowIndex < dgvOfficialDecks.RowCount)
 			{
 				int setWebID = Convert.ToInt32(dgvCardList.Rows[rowIndex].Cells["webid"].Value.ToString());
-				mTracker.AddSetToCollection(setWebID);
+				if (!mTracker.AddSetToCollection(setWebID))
+				{
+					MessageBox.Show("Could not add set with ID: \"" + setWebID.ToString() + "\", set may not exist in the current database.", "Add Set - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+				else
+				{
+					List<string> refreshData = new List<string>();
+					refreshData.Add("dgvUserDecks");
+					StartRefrehsData(refreshData);
+				}
 			}
 		}
 
@@ -706,7 +782,7 @@ namespace YuGiOhTracker
 		private void btnUserCollectionSearch_Click(object sender, EventArgs e)
 		{
 			SearchData sendSearchData = new SearchData();
-			sendSearchData.SearchDGV = "user";
+			sendSearchData.SearchDGV = "usercards";
 			sendSearchData.SearchText = txtUserCollectionSearch.Text;
 			sendSearchData.Box1Text = (cbUserCollectionIn.SelectedItem as ComboboxItem).Value.ToString();
 			sendSearchData.Box2Text = (cbUserCollectionCardType.SelectedItem as ComboboxItem).Value.ToString();
@@ -718,7 +794,7 @@ namespace YuGiOhTracker
 			if(e.KeyCode == Keys.Enter)
 			{
 				SearchData sendSearchData = new SearchData();
-				sendSearchData.SearchDGV = "user";
+				sendSearchData.SearchDGV = "usercards";
 				sendSearchData.SearchText = txtUserCollectionSearch.Text;
 				sendSearchData.Box1Text = (cbUserCollectionIn.SelectedItem as ComboboxItem).Value.ToString();
 				sendSearchData.Box2Text = (cbUserCollectionCardType.SelectedItem as ComboboxItem).Value.ToString();
@@ -760,15 +836,35 @@ namespace YuGiOhTracker
 		#endregion
 
 		#region "User Collection List (Generic)
-		private void btnUserCollectionAdd_Click(object sender, EventArgs e)
+		private void AddCardsFromTextbox()
 		{
 			string cardsToAdd = txtUserCollectionAdd.Text;
-			Regex.Replace(cardsToAdd, @"\s+", "");
-			List<string> cardCodes = cardsToAdd.Split(',').ToList<string>();
-
-			for (int i = 0; i < cardCodes.Count; i++)
+			if(cardsToAdd.Length > 0)
 			{
-				AddCardByCode(cardCodes[i]);
+				Regex.Replace(cardsToAdd, @"\s+", "");
+				List<string> cardCodes = cardsToAdd.Split(',').ToList<string>();
+
+				for (int i = 0; i < cardCodes.Count; i++)
+				{
+					AddCardByCode(cardCodes[i]);
+				}
+			}
+			else
+			{
+				MessageBox.Show("Please enter the codes of the cards you would like to add, and space each code with a comma (',').", "Add Card - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+		}
+
+		private void btnUserCollectionAdd_Click(object sender, EventArgs e)
+		{
+			AddCardsFromTextbox();
+		}
+
+		private void txtUserCollectionAdd_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.KeyCode == Keys.Enter)
+			{
+				AddCardsFromTextbox();
 			}
 		}
 		#endregion

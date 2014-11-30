@@ -426,6 +426,7 @@
 			this.txtUserCollectionAdd.Name = "txtUserCollectionAdd";
 			this.txtUserCollectionAdd.Size = new System.Drawing.Size(574, 20);
 			this.txtUserCollectionAdd.TabIndex = 10;
+			this.txtUserCollectionAdd.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtUserCollectionAdd_KeyDown);
 			// 
 			// lblUserCollectionAdd
 			// 
